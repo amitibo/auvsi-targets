@@ -24,7 +24,7 @@ def main():
         long_description="Training samples generation for the ADLC task in the AUVSI SUAS competition.",
         author="Amit Aides, Ahmad Kiswani",
         author_email="", # Removed to limit spam harvesting.
-        url="https://github.com/amitibo/AUVSItargets/",
+        url="https://github.com/amitibo/auvsi-targets/",
         packages = find_packages(),
         license="BSD",
         zip_safe=False

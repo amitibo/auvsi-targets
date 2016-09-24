@@ -21,7 +21,7 @@ The sofware was developed and used by the TAS team during the
 
 ### Installation
 
-    > git clone 
+    > git clone https://github.com/amitibo/auvsi-targets.git
     > cd auvsi_targets
     > python setup.py develop
 
@@ -34,7 +34,7 @@ The sofware was developed and used by the TAS team during the
 
 The shape samples and letter samples are created under ```DATA/train_images```
 and ```DATA/train_letter``` respectively. Each sample is made of an image
-file and corresponding label file.
+file and a corresponding label file.
 
 ## License
 
