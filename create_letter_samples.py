@@ -23,10 +23,11 @@ import glob
 import os
 import time
 import json
+import argparse
+import multiprocessing
 
-VISUALIZE = False
+
 RESIZED = False
-NCORES = 4
 
 if RESIZED:
     K = gs.resized_K
@@ -37,7 +38,7 @@ else:
 
 crop_index = 0
 
-def main():
+def main(jobs):
     #
     # Setup the paths.
     #
@@ -66,7 +67,7 @@ def main():
         img = AUVSItargets.Image(img_path, data_path, K=K)
         patches = img.createPatches(patch_size=gs.PATCH_SIZE, patch_shift=1000)
 
-        results = Parallel(n_jobs=NCORES)(
+        results = Parallel(n_jobs=jobs)(
             delayed(createPatch)(patch, img, img.latitude, img.longitude, img.yaw) for patch in patches
         )
 
@@ -132,5 +133,18 @@ def createPatch(patch, img, latitude, longitude, yaw):
             
 
 if __name__ == '__main__':
-    main()
+
+    cmdline = argparse.ArgumentParser(usage="usage: ./{fname}".format(fname=os.path.basename(__file__)),
+                                      description="Create letter patches")
+    cmdline.add_argument("--jobs",
+                         "-j",
+                         action="store",
+                         help="Number of cores to use (default=1).",
+                         type=int,
+                         dest="jobs",
+                         default=1)
+
+    args = cmdline.parse_args()
+
+    main(jobs=args.jobs)
     

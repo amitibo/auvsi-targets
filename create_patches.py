@@ -17,11 +17,10 @@ import cv2
 import glob
 import os
 import time
+import argparse
 
-VISUALIZE = False
 
-
-def main():
+def main(visualize):
     #
     # Create paths
     #
@@ -77,7 +76,7 @@ def main():
                 
             patch = cv2.resize(patch, dsize=gs.CLASSIFIER_PATCH_SIZE)
                 
-            if VISUALIZE:
+            if visualize:
                 cv2.namedWindow('original patch', flags=cv2.WINDOW_NORMAL)
                 cv2.imshow('original patch', original_patch)
                 
@@ -98,10 +97,22 @@ def main():
             with open(os.path.join(dst_folder, filename+'.txt'), 'w') as f:
                 f.write('{}.jpg\t{}'.format(filename, label))
                 
-    if VISUALIZE:
+    if visualize:
         cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
+    cmdline = argparse.ArgumentParser(usage="usage: ./{fname}".format(fname=os.path.basename(__file__)),
+                                      description="Create target patches")
+
+    cmdline.add_argument("--visualize",
+                         action="store_true",
+                         help="Visualize outputs.",
+                         dest="visualize",
+                         default=False)
+
+    args = cmdline.parse_args()
+
+    main(visualize=args.visualize)
     main()
     

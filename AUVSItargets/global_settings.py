@@ -3,6 +3,7 @@ import glob
 import numpy as np
 import os
 import pkg_resources
+import platform
 
 
 DATA_PATH = os.path.join(pkg_resources.resource_filename(
@@ -41,8 +42,11 @@ USE_CV2_KMEANS = True
 #
 # Letter parameters.
 #
-FONTS = glob.glob(os.path.join(pkg_resources.resource_filename(
-    'AUVSItargets', 'resources/fonts'), '*.ttf'))
+FONTS = None
+if platform.system() == 'Linux':
+    FONTS = glob.glob("/usr/share/fonts/truetype/dejavu/*.ttf")
+else:
+    FONTS = ["C:\Windows\Fonts\Arialbd.ttf"]
 
 #
 # Letter classes. The simple set includes only upper case letters.
