@@ -1,0 +1,7 @@
+ExifRead==2.1.2
+Pillow==3.3.1
+PyQRCode==1.2.1
+argparse==1.2.1
+numpy==1.11.1
+pypng==0.0.18
+wsgiref==0.1.2

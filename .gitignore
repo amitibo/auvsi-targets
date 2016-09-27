@@ -1,1 +1,11 @@
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+.venv/
 *.pyc
+
+DATA/train_images/
+DATA/train_letter/
+aggdraw/
