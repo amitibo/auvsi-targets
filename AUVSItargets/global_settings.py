@@ -52,8 +52,8 @@ else:
 # Letter classes. The simple set includes only upper case letters.
 # The 'extra' set includes all alphanumeric letters.
 #
-EXTRA_SET = False
-if EXTRA_SET:
+ALPHA_NUMERIC = True
+if ALPHA_NUMERIC:
     LETTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     ROTATABLE_LETTERS = '12345679ABCDEFGJKLMPQRTUVWYabcdefghijkmnpqrtuvwy'
     HALF_ROTATABLE_LETTERS = '8HINSXZsxz'
