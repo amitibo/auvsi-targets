@@ -1,4 +1,5 @@
-Make the following params command line arguments:
-1) Number of generated targets
-2) Percentage of empty patches
-
+1) Add the following as command line arguments:
+        1) Number of generated targets
+        2) Percentage of empty patches (The current 50% is not a good default for training)
+        3) Output folder
+2) Unit tests
