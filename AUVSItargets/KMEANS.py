@@ -1,18 +1,18 @@
 from __future__ import division
 import numpy as np
-import scipy as sp
 import scipy.cluster as spc
 import scipy.ndimage.morphology as spm
-import AUVSItargets.global_settings as gs
-import glob
 import cv2
-import os
+
+import AUVSItargets.global_settings as gs
 
 VISUALIZE = False
 
 
 def innerMost(R, shape_colors_map, shape_indices):
-    if R.ravel()[shape_indices[shape_colors_map==0]].mean() < R.ravel()[shape_indices[shape_colors_map==1]].mean():
+    mean_0 = R.ravel()[shape_indices[shape_colors_map == 0]].mean()
+    mean_1 = R.ravel()[shape_indices[shape_colors_map == 1]].mean()
+    if mean_0 < mean_1:
         inner_index = 0
     else:
         inner_index = 1
@@ -45,7 +45,8 @@ def getLetterMask_scipy(img):
 
     #
     # Smooth the map to remove noise.
-    # Erode it to remove the border of the shape the might damage the segmentation to shape and letter.
+    # Erode it to remove the border of the shape that might damage the
+    # segmentation to shape and letter.
     #
     shape_mask = np.zeros(img.shape[:2], dtype=np.uint8)
     shape_mask.ravel()[color_map == shape_index] = 1
@@ -88,7 +89,7 @@ def getLetterMask_scipy(img):
     neto_shape_mask.ravel()[neto_shape_indices] = 0  # ATODO
 
     letter_mask = cv2.erode(letter_mask, kernel, iterations=1)
-    
+
     return letter_mask, colors
 
 
@@ -121,7 +122,7 @@ def getLetterMask_cv2(crop):
     #
     lab = cv2.cvtColor(crop, cv2.COLOR_BGR2LAB)
     lab_points = lab.reshape(-1, 3).astype(np.float32)
-    
+
     K = 4
     while K > 1:
         success, labels, centers = calcKMeans(lab_points, K)
@@ -155,7 +156,7 @@ def getLetterMask_cv2(crop):
             win_name = 'bin {}'.format(i)
             cv2.namedWindow(win_name, flags=cv2.WINDOW_NORMAL)
             cv2.imshow(win_name, bin_imgs[o]*255)
-            
+
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -239,7 +240,8 @@ def getLetterMask_cv2(crop):
     # Identify the letter, fg masks
     #
     colors = np.squeeze(
-        cv2.cvtColor(centers.reshape(2, 1, 3).astype(np.uint8), cv2.COLOR_LAB2RGB)
+        cv2.cvtColor(centers.reshape(2, 1, 3).astype(np.uint8),
+            cv2.COLOR_LAB2RGB)
     )
 
     letter_index = np.argmin(moments)

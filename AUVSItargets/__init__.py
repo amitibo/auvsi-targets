@@ -1,5 +1,5 @@
-from .targets import *
-from .images import *
-from .utils import *
-import transformation_matrices as transofrms
-import KMEANS
+from AUVSItargets.targets import *
+from AUVSItargets.images import *
+from AUVSItargets.utils import *
+import AUVSItargets.transformation_matrices as transofrms
+import AUVSItargets.KMEANS

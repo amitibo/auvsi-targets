@@ -1,14 +1,12 @@
-"""
-"""
-
 from __future__ import division
 import math
 import numpy as np
 import functools
 import hashlib
 import random
-import AUVSItargets.global_settings as gs
 import cv2
+
+import AUVSItargets.global_settings as gs
 
 __all__ = (
     'memoized',
@@ -21,22 +19,27 @@ __all__ = (
 
 
 def squareCoords(coords, noise=False):
-    """Return coords in the form of a square, centered around the original coords. Possibly perturbating the coords."""
+    """Return coords in the form of a square, centered around the original
+    coords. Possibly perturbation the coords."""
 
     patch_h, patch_w = coords[2]-coords[0], coords[3]-coords[1]
     patch_hw = max(patch_h, patch_w)
-    
+
     if noise:
         tmp = int(patch_hw*random.uniform(0, gs.PATCH_COORDS_NOISE))
         patch_hw += tmp
 
-    patch_cx, patch_cy = int((coords[2]+coords[0]-patch_hw)/2), int((coords[3]+coords[1]-patch_hw)/2)
-    
+    patch_cx = int((coords[2]+coords[0]-patch_hw)/2)
+    patch_cy = int((coords[3]+coords[1]-patch_hw)/2)
+
     if noise:
         patch_cx += int(random.randint(-tmp, tmp)/2)
         patch_cy += int(random.randint(-tmp, tmp)/2)
-        
-    square_coords = max(patch_cx, 0), max(patch_cy, 0), patch_cx+patch_hw, patch_cy+patch_hw
+
+    square_coords = max(patch_cx, 0), \
+                    max(patch_cy, 0), \
+                    patch_cx+patch_hw, \
+                    patch_cy+patch_hw
 
     return square_coords
 
@@ -48,7 +51,8 @@ def tightCrop(mask):
     x_nnz = np.squeeze(mask).astype(np.float32).sum(axis=0).nonzero()[0]
     y_nnz = np.squeeze(mask).astype(np.float32).sum(axis=1).nonzero()[0]
 
-    rect = np.array([x_nnz[0], y_nnz[0], x_nnz[-1]-x_nnz[0], y_nnz[-1]-y_nnz[0]])
+    rect = np.array([x_nnz[0], y_nnz[0],
+        x_nnz[-1]-x_nnz[0], y_nnz[-1]-y_nnz[0]])
 
     #
     # Square the rectangle so the the scaling will not distort the letter.
@@ -65,7 +69,8 @@ def tightCrop(mask):
     #
     # Calculate an affine transform that centers the letter.
     #
-    src = np.array(((rect[0], rect[1]), (rect[0], rect[1]+rect[3]), (rect[0] + rect[2], rect[1] + rect[3])), dtype=np.float32)
+    src = np.array(((rect[0], rect[1]), (rect[0], rect[1]+rect[3]),
+        (rect[0] + rect[2], rect[1] + rect[3])), dtype=np.float32)
     LD_MARGIN = gs.LETTER_PATCH_SIZE[0] - gs.LETTER_MARGIN
     dst = np.array(
         (
@@ -90,14 +95,14 @@ def tightCrop(mask):
 
 class memoized(object):
     '''Decorator. Caches a function's return value each time it is called.
-    If called later with the same arguments, the cached value is returned 
+    If called later with the same arguments, the cached value is returned
     (not reevaluated).
     '''
     def __init__(self, func, onlylast=False):
         self.__func = func
         self.__cache = {}
         self.__onlylast = onlylast
-        
+
     def __call__(self, *args, **kwargs):
         ckey = hashlib.sha1(self.__func.__name__)
         for a in args:
@@ -115,11 +120,11 @@ class memoized(object):
             self.__cache[ckey] = result
 
         return result
-      
+
     def __repr__(self):
         '''Return the function's docstring.'''
         return self.func.__doc__
-    
+
     def __get__(self, obj, objtype):
         '''Support instance methods.'''
         return functools.partial(self.__call__, obj)
@@ -136,11 +141,11 @@ def bytesize(arr):
 def array2lmdb(X, y, lmdb_path):
     import caffe
     import lmdb
-    
+
     N = X.shape[0]
 
-    # We need to prepare the database for the size. If you don't have 
-    # deepdish installed, just set this to something comfortably big 
+    # We need to prepare the database for the size. If you don't have
+    # deepdish installed, just set this to something comfortably big
     # (there is little drawback to settings this comfortably big).
     map_size = bytesize(X) * 2
 
@@ -198,10 +203,10 @@ def loadFDdata(base_folder, test=False, cols=None):
 
 def angle2dcm(yaw, pitch, roll, input_units='rad', rotation_sequence='321'):
     """
-    Returns a transformation matrix (aka direction cosine matrix or DCM) which 
-    transforms from navigation to body frame.  Other names commonly used, 
-    besides DCM, are `Cbody2nav` or `Rbody2nav`.  The rotation sequence 
-    specifies the order of rotations when going from navigation-frame to 
+    Returns a transformation matrix (aka direction cosine matrix or DCM) which
+    transforms from navigation to body frame.  Other names commonly used,
+    besides DCM, are `Cbody2nav` or `Rbody2nav`.  The rotation sequence
+    specifies the order of rotations when going from navigation-frame to
     body-frame.  The default is '321' (i.e Yaw -> Pitch -> Roll).
 
     Parameters
@@ -210,14 +215,14 @@ def angle2dcm(yaw, pitch, roll, input_units='rad', rotation_sequence='321'):
     pitch : pitch angle, units of input_units.
     roll  : roll angle , units of input_units.
     input_units: units for input angles {'rad', 'deg'}, optional.
-    rotationSequence: assumed rotation sequence {'321', others can be 
+    rotationSequence: assumed rotation sequence {'321', others can be
                                                 implemented in the future}.
 
     Returns
     -------
     Rnav2body: 3x3 transformation matrix (numpy matrix data type).  This can be
                used to convert from navigation-frame (e.g NED) to body frame.
-        
+
     Notes
     -----
     Since Rnav2body is a proper transformation matrix, the inverse
@@ -226,27 +231,27 @@ def angle2dcm(yaw, pitch, roll, input_units='rad', rotation_sequence='321'):
 
     Reference
     ---------
-    [1] Equation 2.4, Aided Navigation: GPS with High Rate Sensors, Jay A. Farrel 2008
+    [1] Equation 2.4, Aided Navigation: GPS with High Rate Sensors,Jay A. Farrel 2008
     [2] eul2Cbn.m function (note, this function gives body->nav) at:
     http://www.gnssapplications.org/downloads/chapter7/Chapter7_GNSS_INS_Functions.tar.gz
-    
+
     Copyright (c) 2014, NavPy Developers
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
-    
+
     1. Redistributions of source code must retain the above copyright notice, this
        list of conditions and the following disclaimer.
-    
+
     2. Redistributions in binary form must reproduce the above copyright notice,
        this list of conditions and the following disclaimer in the documentation
        and/or other materials provided with the distribution.
-    
+
     3. Neither the name of the copyright holder nor the names of its contributors
        may be used to endorse or promote products derived from this software
        without specific prior written permission.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -278,12 +283,12 @@ def angle2dcm(yaw, pitch, roll, input_units='rad', rotation_sequence='321'):
                 [-s_y*c_r + c_y*s_p*s_r,  c_y*c_r + s_y*s_p*s_r,  c_p*s_r],
                 [ s_y*s_r + c_y*s_p*c_r, -c_y*s_r + s_y*s_p*c_r,  c_p*c_r]])
 
-    else: 
+    else:
         # No other rotation sequence is currently implemented
         print('WARNING (angle2dcm): requested rotation_sequence is unavailable.')
         print('                     NaN returned.')
         Rnav2body = np.nan
-    
+
     return Rnav2body
 
 

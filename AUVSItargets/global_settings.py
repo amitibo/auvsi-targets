@@ -8,7 +8,7 @@ import platform
 
 DATA_PATH = os.path.join(pkg_resources.resource_filename(
     'AUVSItargets', '../DATA'))
-                         
+
 #
 # Target size ranges in meters.
 #
@@ -46,7 +46,7 @@ FONTS = None
 if platform.system() == 'Linux':
     FONTS = glob.glob("/usr/share/fonts/truetype/dejavu/*.ttf")
 else:
-    FONTS = ["C:\Windows\Fonts\Arialbd.ttf"]
+    FONTS = [r"C:\Windows\Fonts\Arialbd.ttf"]
 
 #
 # Letter classes. The simple set includes only upper case letters.
