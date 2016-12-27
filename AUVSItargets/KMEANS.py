@@ -100,7 +100,13 @@ def calcKMeans(points, K):
         return False, None, None
 
     term_crit = (cv2.TERM_CRITERIA_EPS, 30, 0.1)
-    ret, labels, centers = cv2.kmeans(points, K, term_crit, 10, 0)
+    if cv2.__version__[0] == '3':
+        #
+        # The interface is slightly different in the case of cv2 version 3.
+        #
+        ret, labels, centers = cv2.kmeans(points, K, None, term_crit, 10, 0)
+    else:
+        ret, labels, centers = cv2.kmeans(points, K, term_crit, 10, 0)
 
     #
     # Evaluate success.
@@ -166,22 +172,45 @@ def getLetterMask_cv2(crop):
     # bigger as somtimes the letter color matches
     # a very noisy surrounding.
     #
-    contours, hierarchy = cv2.findContours(
-        bin_imgs[order[0]].copy(),
-        cv2.RETR_TREE,
-        cv2.CHAIN_APPROX_SIMPLE
-    )
+    if cv2.__version__[0] == '3':
+        #
+        # It seems that in version 3.1.0 (and possibly other >3 versions) the
+        # findContours function returns: binary_img, contours, hierarchy tuple.
+        #
+        _, contours, hierarchy = cv2.findContours(
+            bin_imgs[order[0]].copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+    else:
+        contours, hierarchy = cv2.findContours(
+            bin_imgs[order[0]].copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+        
     if len(contours) == 0:
         area0 = 0
     else:
         contours0 = max(contours, key=cv2.contourArea)
         area0 = cv2.contourArea(contours0)
 
-    contours, hierarchy = cv2.findContours(
-        bin_imgs[order[1]].copy(),
-        cv2.RETR_TREE,
-        cv2.CHAIN_APPROX_SIMPLE
-    )
+    if cv2.__version__[0] == '3':
+        #
+        # It seems that in version 3.1.0 (and possibly other >3 versions) the
+        # findContours function returns: binary_img, contours, hierarchy tuple.
+        #
+        _, contours, hierarchy = cv2.findContours(
+            bin_imgs[order[1]].copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+    else:
+        contours, hierarchy = cv2.findContours(
+            bin_imgs[order[1]].copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
     if len(contours) == 0:
         area1 = 0
     else:
@@ -204,11 +233,18 @@ def getLetterMask_cv2(crop):
     kernel = np.ones((3, 3), np.uint8)
     shape = cv2.filter2D(shape, -1, kernel)
     shape[shape>0] = 1
-    contours, hierarchy = cv2.findContours(
-        shape.copy(),
-        cv2.RETR_TREE,
-        cv2.CHAIN_APPROX_SIMPLE
-    )
+    if cv2.__version__[0] == '3':
+        _, contours, hierarchy = cv2.findContours(
+            shape.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+    else:
+        contours, hierarchy = cv2.findContours(
+            shape.copy(),
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
     max_contour = max(contours, key=cv2.contourArea)
     filled = np.zeros_like(shape)
     cv2.fillPoly(filled, [np.squeeze(max_contour)], (1,))

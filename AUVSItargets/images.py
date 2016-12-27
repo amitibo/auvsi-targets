@@ -116,7 +116,17 @@ def overlay(img, target, M, intensity_scale,
     binary_img = (np.squeeze(overlay_alpha) > 0).astype(np.uint8)
     contour = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL,
         method=cv2.CHAIN_APPROX_NONE)
-    rect = cv2.boundingRect(points=contour[0][0])
+    if cv2.__version__[0] == '3':
+        #
+        # It seems that in version 3.1.0 (and possibly other >3 versions) the
+        # findContours function returns: binary_img, contours, hierarchy tuple.
+        #
+        rect = cv2.boundingRect(points=contour[1][0])        
+    else:
+        #
+        # In opencv version 2.4 the output is the countours.
+        #
+        rect = cv2.boundingRect(points=contour[0][0])
 
     return rect[0]+offsets[0], \
            rect[1]+offsets[1], \

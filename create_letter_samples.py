@@ -9,15 +9,16 @@ License: See attached license file
 """
 
 from __future__ import division
+import argparse
 import AUVSItargets
 import AUVSItargets.global_settings as gs
-import random
-import shutil
-from joblib import Parallel, delayed
 import cv2
 import glob
+from joblib import Parallel, delayed
 import os
-import argparse
+import random
+import shutil
+import traceback
 
 RESIZED = False
 if RESIZED:
@@ -121,6 +122,7 @@ def create_patch(patch, img, latitude, longitude, yaw):
 
         mask = AUVSItargets.tightCrop(kmean_mask)
     except:
+        print(traceback.format_exc())
         return None, None
 
     print gs.LETTER_LABELS.index(letter_label)
